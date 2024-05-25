@@ -7,34 +7,37 @@
 #include <istream>
 #include <ostream>
 
-class delay_martix{
+class delay_matrix{
     public:
-    delay_martix(int _num_node) : num_node(_num_node){
-        // martix.resize(num_node*(num_node-1)/2);
+    delay_matrix(int _num_node) : num_node(_num_node){
+        // matrix.resize(num_node*(num_node-1)/2);
     }
-    // delay_martix(int _num_node, std::vector<double> &data){
-    //     martix.resize(num_node*num_node);
-    //     std::copy(data.begin(), data.end(), martix.begin());
+    // delay_matrix(int _num_node, std::vector<double> &data){
+    //     matrix.resize(num_node*num_node);
+    //     std::copy(data.begin(), data.end(), matrix.begin());
     // }
-    double get_delay_ij(int i, int j){ 
-        assert(i < num_node && j < num_node);
-        return martix[i*num_node+j];
+    
+    // double get_delay_ij(int i, int j){ 
+    //     assert(i < num_node && j < num_node);
+    //     return matrix[i*num_node+j];
+    // }
+
+    double get_delay_ij(int i, int j) {
+    assert(i >= 0 && i < num_node && j >= 0 && j < num_node);
+    return matrix[i * num_node + j];
     }
-    void set_delay_ij(int i, int j, double value){
-        assert(i < num_node && j < num_node);
-        martix[i*num_node+j] = value;
-    }
+
     void load(std::string path){
         std::ifstream infile(path);
         double tmp;
         while(infile >> tmp){
-            martix.push_back(tmp);
+            matrix.push_back(tmp);
         }
     }
     
     private:
     int num_node;
-    std::vector<double> martix;
+    std::vector<double> matrix;
 };
 
 class group_id{

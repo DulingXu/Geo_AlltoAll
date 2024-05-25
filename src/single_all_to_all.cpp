@@ -1,27 +1,27 @@
 #include <iostream>
-#include <type.hpp>
-#include <io.hpp>
+#include "../include/type.hpp"
+#include "../include/io.hpp"
 #include <cstdlib>
 
 
 //parameter
 /*
 @num_of_node number of node
-@dalay_martix: martix[N*N] 
+@dalay_matrix: matrix[N*N] 
 @group_id: N group_id[N]
 @operator: N write_read_set
 */
 
 int main(int argc, char **argv){
     if(argc != 4){
-        printf("Usage: %s num_node martix_path group_path\n", argv[0]);
+        printf("Usage: %s num_node matrix_path group_path\n", argv[0]);
         return 0;
     }
     //load data
     int num_node = atoi(argv[1]);
-    delay_martix dm(num_node);
-    std::string martix_path = argv[2];
-    dm.load(martix_path);
+    delay_matrix dm(num_node);
+    std::string matrix_path = argv[2];
+    dm.load(matrix_path);
     group_id group;
     std::string group_path = argv[3];
     std::cout << group_path << std::endl;
