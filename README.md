@@ -41,11 +41,13 @@ $exec <num_node> <matrix_path> <group_path>
 ```
 
 // 修改时延加和逻辑 算出单论时延长度
+
 // 修改节点分组逻辑 显示表示
+
 // 增加时延文件 写一个多伦的时延计算 并且输出简单图像
 
 
-
+‘’‘shell
 project/
 ├── include/       # 头文件目录，存放项目的头文件 (.hpp, .h)
 │   ├── type.hpp
@@ -58,3 +60,4 @@ project/
 ├── build/         # 编译输出目录，存放编译生成的文件（可选）
 ├── run.sh         # 执行脚本文件
 └── Makefile       # 构建脚本或项目配置文件
+'''shell
