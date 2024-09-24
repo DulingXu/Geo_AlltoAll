@@ -45,9 +45,13 @@ int main(int argc, char **argv){
         }
         phy_group_delay[i] = max_delay;
     }
+
+
+    // std::vector<double>.get
+
     
     for(int i = 0; i < num_group; i++){
-        printf("Group %d physical delay: %.4lf\n", i, phy_group_delay[i]);
+        printf("Group %d physical delay: %.4lf\n", i + 1 , phy_group_delay[i]);
     }
     return 0;
 }
