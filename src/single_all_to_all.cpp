@@ -1,57 +1,113 @@
 #include <iostream>
-#include "../include/type.hpp"
-#include "../include/io.hpp"
-#include <cstdlib>
+#include <vector>
+#include <fstream>
+#include <limits>
 
+using namespace std;
 
-//parameter
-/*
-@num_of_node number of node
-@dalay_matrix: matrix[N*N] 
-@group_id: N group_id[N]
-@operator: N write_read_set
-*/
-
-int main(int argc, char **argv){
-    if(argc != 4){
-        printf("Usage: %s num_node matrix_path group_path\n", argv[0]);
-        return 0;
+void printPath(const vector<vector<int>>& next, int i, int j) {
+    if (next[i][j] == -1) {
+        cout << "No path";
+        return;
     }
-    //load data
-    int num_node = atoi(argv[1]);
-    delay_matrix dm(num_node);
-    std::string matrix_path = argv[2];
-    dm.load(matrix_path);
-    group_id group;
-    std::string group_path = argv[3];
-    std::cout << group_path << std::endl;
-    group.load(group_path);
-    // std::string set_path = argv[4];
-    // std::vector<operator_set<int, double>> ops(num_node);
-    // ops.load(set_path);
+    cout << i;
+    while (i != j) {
+        i = next[i][j];
+        cout << " -> " << i;
+    }
+}
 
-    //compute the physical delay within each group
-    int num_group = group.get_num_group();
+int main() {
+    ifstream infile("../dataset/delay_matrix.txt");
+    if (!infile) {
+        cerr << "Error opening file!" << endl;
+        return 1; // 退出程序
+    }
 
-    std::vector<double> phy_group_delay(num_group);
-    for(int i = 0; i < group.get_num_group(); ++i){ // for each group
-        int center_id = group.get_group_centerid(i); 
-        std::vector<int> group_member = group.get_group_member(i);
-        double max_delay = 0;
-        for(int i = 0; i < group_member.size(); ++i){
-            if(group_member[i] == center_id) continue;
-            // get the maximum delay from each group member to center
-           max_delay = std::max(max_delay, dm.get_delay_ij(group_member[i], center_id));
+    ofstream outfile("../dataset/new_delay_matrix.txt");
+    if (!outfile) {
+        cerr << "Error opening output file!" << endl;
+        return 1; // 退出程序
+    }
+
+    while (true) {
+        int N;
+        infile >> N;
+        if (infile.eof()) break; // 检查文件末尾
+
+        vector<vector<int>> dist(N, vector<int>(N, numeric_limits<int>::max()));
+        vector<vector<int>> next(N, vector<int>(N, -1));
+
+        // 读取延迟矩阵
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                infile >> dist[i][j];
+                if (dist[i][j] < numeric_limits<int>::max() && i != j) {
+                    next[i][j] = j;  // 设置下一节点
+                }
+            }
         }
-        phy_group_delay[i] = max_delay;
+
+        // Floyd-Warshall 算法
+        for (int k = 0; k < N; k++) {
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    if (dist[i][k] != numeric_limits<int>::max() && dist[k][j] != numeric_limits<int>::max()) {
+                        if (dist[i][j] > dist[i][k] + dist[k][j]) {
+                            dist[i][j] = dist[i][k] + dist[k][j];
+                            next[i][j] = next[i][k];  // 更新下一节点
+                        }
+                    }
+                }
+            }
+        }
+
+        // 剪枝：找出未使用的边并生成新的时延矩阵
+        vector<vector<string>> new_dist(N, vector<string>(N, "null"));
+        vector<vector<bool>> used(N, vector<bool>(N, false));
+
+        // 标记使用过的边
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (i != j && dist[i][j] < numeric_limits<int>::max()) {
+                    int current = i;
+                    while (current != j) {
+                        used[current][next[current][j]] = true;
+                        current = next[current][j];
+                    }
+                    used[i][j] = true; // 直接标记当前边
+                }
+            }
+        }
+
+        // 更新新的时延矩阵，未使用的边设置为 null，并输出被剪掉的边
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (i == j) {
+                    new_dist[i][j] = "0";  // 自己到自己的距离为0
+                } else if (used[i][j]) {
+                    new_dist[i][j] = to_string(dist[i][j]);  // 记录最短路径的时延
+                } else {
+                    // 输出被剪掉的边的原始值
+                    cout << "Node " << i << " ---> " << j << ", delay = " << dist[i][j] << " is cut." << endl;
+                    new_dist[i][j] = "null";  // 将未使用的边设置为 null
+                }
+            }
+        }
+
+        // 写入新的延迟矩阵到文件
+        outfile << N << endl; // 输出新的组的节点数量
+        for (const auto& row : new_dist) {
+            for (const auto& val : row) {
+                outfile << val << " ";
+            }
+            outfile << endl;
+        }
     }
 
+    cout << "New delay matrices written to new_delay_matrix.txt" << endl;
 
-    // std::vector<double>.get
-
-    
-    for(int i = 0; i < num_group; i++){
-        printf("Group %d physical delay: %.4lf\n", i + 1 , phy_group_delay[i]);
-    }
+    infile.close();
+    outfile.close();
     return 0;
 }
