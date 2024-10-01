@@ -3,39 +3,71 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <string>
+#include <stdexcept>
+#include <algorithm>
 
 // 定义一个大数作为无穷大
 const double INF = std::numeric_limits<double>::infinity();
 
-// 读取矩阵并计算节点数量
-int determine_matrix_size(const std::string& matrix_path) {
-    std::ifstream infile(matrix_path);
-    std::string line;
-    
-    if (std::getline(infile, line)) { // 读取第一行
-        std::istringstream iss(line);
-        std::vector<double> first_row((std::istream_iterator<double>(iss)), std::istream_iterator<double>());
-        return first_row.size();  // 返回第一行的元素数量，即矩阵的维度
+// 打印矩阵（用于调试）
+void print_matrix(const std::vector<std::vector<double>>& matrix) {
+    for (const auto& row : matrix) {
+        for (const auto& value : row) {
+            if (value == INF) {
+                std::cout << "-1 ";
+            } else {
+                std::cout << value << " ";
+            }
+        }
+        std::cout << std::endl;
     }
-
-    return -1; // 如果文件读取失败，返回 -1
 }
 
-// 读取延迟矩阵文件
-std::vector<std::vector<double>> load_delay_matrix(const std::string& matrix_path, int num_node) {
-    std::vector<std::vector<double>> matrix(num_node, std::vector<double>(num_node, INF));
+// 读取 JSON 文件并解析为矩阵
+std::vector<std::vector<double>> load_delay_matrix(const std::string& matrix_path) {
     std::ifstream infile(matrix_path);
+    std::vector<std::vector<double>> matrix;
     std::string line;
-    int row = 0;
-    
-    while (std::getline(infile, line) && row < num_node) {
-        std::istringstream iss(line);
-        for (int col = 0; col < num_node; ++col) {
-            iss >> matrix[row][col];
-        }
-        ++row;
+
+    if (!infile.is_open()) {
+        std::cerr << "Error opening file: " << matrix_path << std::endl;
+        return matrix;
     }
-    
+
+    while (std::getline(infile, line)) {
+        // 跳过包含 [ 和 ] 的行
+        if (line.find('[') != std::string::npos || line.find(']') != std::string::npos) {
+            continue;
+        }
+
+        std::vector<double> matrix_row;
+        std::stringstream ss(line);
+        std::string value;
+
+        // 处理当前行中的每个值
+        while (std::getline(ss, value, ',')) {  // 用逗号分隔
+            // 移除引号
+            value.erase(std::remove(value.begin(), value.end(), '\"'), value.end());
+
+            try {
+                if (!value.empty()) {
+                    matrix_row.push_back(std::stod(value));  // 将字符串转换为 double
+                }
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "Conversion error: " << e.what() << " for value: " << value << std::endl;
+            }
+        }
+
+        if (!matrix_row.empty()) {
+            matrix.push_back(matrix_row);
+        }
+    }
+
+    std::cout << "Matrix loaded from file:" << std::endl;
+    print_matrix(matrix); // 调试：打印读取的矩阵
+    std::cout << "Matrix size: " << matrix.size() << "x" << (matrix.empty() ? 0 : matrix[0].size()) << std::endl;
+
     return matrix;
 }
 
@@ -64,7 +96,7 @@ std::vector<std::vector<double>> floyd_warshall(const std::vector<std::vector<do
 
 // 将矩阵保存到文件中
 void save_matrix_to_file(const std::vector<std::vector<double>>& matrix, const std::string& file_path) {
-    std::ofstream outfile(file_path);
+    std::ofstream outfile(file_path, std::ios::app); // 以追加方式打开文件
     int num_node = matrix.size();
     
     for (int i = 0; i < num_node; ++i) {
@@ -80,28 +112,20 @@ void save_matrix_to_file(const std::vector<std::vector<double>>& matrix, const s
     outfile.close();
 }
 
-int main(int argc, char **argv) {
-    if (argc != 3) {
-        printf("Usage: %s matrix_path output_path\n", argv[0]);
-        return 0;
-    }
+int main() {
+    const std::string matrix_path = "/Users/duling/Desktop/code/Geo_All2All/dataset/reallset/latency/1/matrix_0.json";
+    const std::string output_path = "/Users/duling/Desktop/code/Geo_All2All/output/result.txt"; // 输出路径
 
-    // 获取输入和输出文件路径
-    std::string matrix_path = argv[1]; // 输入文件路径
-    std::string output_path = argv[2]; // 输出文件路径
+    // 读取延迟矩阵
+    std::vector<std::vector<double>> delay_matrix = load_delay_matrix(matrix_path);
 
-    // 计算节点数量
-    int num_node = determine_matrix_size(matrix_path);
-    if (num_node == -1) {
-        std::cerr << "Error: Failed to read the delay matrix file." << std::endl;
+    if (delay_matrix.empty()) {
+        std::cerr << "Error: Loaded matrix is empty." << std::endl;
         return -1;
     }
 
-    // 加载延迟矩阵
-    std::vector<std::vector<double>> delay_matrix = load_delay_matrix(matrix_path, num_node);
-
     // 执行Floyd-Warshall算法
-    std::vector<std::vector<double>> shortest_paths = floyd_warshall(delay_matrix, num_node);
+    std::vector<std::vector<double>> shortest_paths = floyd_warshall(delay_matrix, delay_matrix.size());
 
     // 将结果保存到文件
     save_matrix_to_file(shortest_paths, output_path);
