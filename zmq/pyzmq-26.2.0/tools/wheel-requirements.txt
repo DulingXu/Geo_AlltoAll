@@ -1,0 +1,2 @@
+cibuildwheel==2.20.*
+delvewheel==1.7.2; sys_platform == 'win32'
