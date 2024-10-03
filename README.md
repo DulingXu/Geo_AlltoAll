@@ -1,5 +1,8 @@
 # ALL-to-ALL
 
+# Attention
+This project is a modified version of [pyzmq](https://github.com/zeromq/pyzmq), which is licensed under the MIT License. Modifications include [……] to support my research .
+
 ## Get started
 
 This is the benchmark repo for all to all test.
