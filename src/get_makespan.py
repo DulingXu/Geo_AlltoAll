@@ -2,8 +2,53 @@ import os
 import json
 import numpy as np
 import subprocess
+import argparse  # 用于解析命令行参数
+import logging
+import sys
 
 MESSAGE_SIZE_MB = 10  # 假设消息大小为10MB
+
+def setup_logger(log_file_path):
+    """
+    设置日志功能，记录所有终端输出到指定的日志文件。
+    :param log_file_path: 日志文件路径
+    """
+    # 创建 logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    # 创建文件处理器
+    file_handler = logging.FileHandler(log_file_path, mode='w')
+    file_handler.setLevel(logging.INFO)
+
+    # 创建终端处理器
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+
+    # 设置日志格式
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
+
+    # 将处理器添加到 logger
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    # 重定向print到log和控制台
+    class PrintLogger:
+        def __init__(self):
+            self.terminal = sys.stdout
+
+        def write(self, message):
+            self.terminal.write(message)
+            logging.info(message.strip())  # 记录到日志文件
+
+        def flush(self):
+            pass  # 需要为了兼容sys.stdout的功能
+
+    sys.stdout = PrintLogger()
+    
+# ---------------------------------------------------------------------------------------------------------
 
 def load_data(file_path):
     """
@@ -17,15 +62,17 @@ def load_data(file_path):
         with open(file_path, 'r') as f:
             data = json.load(f)  # 读取 JSON 数据
         array_data = np.array(data, dtype=float)
-        
-        # 不再强制要求数据为矩阵，因为可能是数组
         return array_data
+    
     except json.JSONDecodeError as e:
         print(f"解析 JSON 文件时出错: {e}")
         return None
+    
     except Exception as e:
         print(f"加载数据时出错: {e}")
         return None
+
+# ---------------------------------------------------------------------------------------------------------
 
 def print_loaded_data(latency_matrix, bandwidth_array, conflict_matrix, num_messages_array, group_result):
     """
@@ -44,61 +91,43 @@ def print_loaded_data(latency_matrix, bandwidth_array, conflict_matrix, num_mess
     print(group_result)
     print("--------------------------\n")
 
-def calculate_makespan(latency_matrix, bandwidth_array, conflict_matrix, message_size, num_messages_array, group_result):
-    """
-    计算 makespan 的占位函数。
-    :param latency_matrix: 时延矩阵 (NxN)
-    :param bandwidth_array: 带宽数组 (N)  （Mbps）
-    :param conflict_matrix: 冲突率矩阵 (NxN) (百分比率)
-    :param message_size: 消息大小（MB）
-    :param num_messages_array: 每个节点发送的消息个数 (N) 
-    :param group_result: 从 get_group.py 得到的分组情况
-    :return: 假设的 makespan 值
-    """
-    num_nodes = len(bandwidth_array)  # 节点数量
-    total_data_transferred = sum(num_messages_array) * message_size  # 总数据量
-    avg_bandwidth = np.mean(bandwidth_array)  # 平均带宽
-
-    # 在计算中结合 group_result 进行处理
-    # 假设 makespan 是总数据量除以平均带宽的结果
-    makespan = total_data_transferred / avg_bandwidth
-    return makespan
-
-def call_get_group(latency_file):
+# ----------------------------------------------------------------------------------------------
+def call_get_group(algorithm, latency_file, output_dir=None):
     """
     调用 get_group.py 并获取分组结果。
-    假设 get_group.py 将分组结果输出到文件。
+    :param algorithm: 分组算法的名称 (例如 "shortest")
+    :param latency_file: 时延矩阵文件路径
+    :param output_dir: 输出分组结果的目录路径，可选。如果不提供，将使用默认路径。
+    :return: 分组结果列表
     """
     try:
-        output_dir = "/Users/duling/Desktop/code/Geo_All2All/output/group_result/shortest"
+        if output_dir is None:
+            output_dir = "/Users/duling/Desktop/code/Geo_All2All/output/group_result/shortest"
         
         # 确保输出目录存在
         os.makedirs(output_dir, exist_ok=True)
 
         # 调用 get_group.py
         result = subprocess.run(
-            ["python3", "get_group.py", latency_file],  # 调用 get_group.py，并传递时延文件
+            ["python3", "get_group.py", algorithm, latency_file, output_dir],
             capture_output=True, text=True, check=True
         )
-
-        # 输出调试信息
-        if result.returncode != 0:
-            raise RuntimeError(f"get_group.py 执行失败，返回代码: {result.returncode}")
 
         print(f"get_group.py 标准输出: {result.stdout}")
         print(f"get_group.py 标准错误: {result.stderr}")
 
+        if result.returncode != 0:
+            raise RuntimeError(f"get_group.py 执行失败，返回代码: {result.returncode}")
+
         # 读取保存的分组结果文件
-        group_file = os.path.join(output_dir, "shortest_matrix_0.txt")
+        group_file = os.path.join(output_dir, f"{algorithm}_{os.path.splitext(os.path.basename(latency_file))[0]}_group.json")
         if not os.path.exists(group_file):
             raise FileNotFoundError(f"未找到分组结果文件: {group_file}")
 
-        group_result = []
         with open(group_file, 'r') as f:
-            for line in f:
-                group = list(map(int, line.strip().split()))  # 将每行数据转为整数列表
-                group_result.append(group)
+            group_result = json.load(f)  # 读取 JSON 格式的分组结果
 
+        print(f"读取的分组结果: {group_result}")  # 添加调试信息
         return group_result
     
     except subprocess.CalledProcessError as e:
@@ -111,37 +140,8 @@ def call_get_group(latency_file):
         print(f"读取分组结果时出错: {e}")
         return None
 
-def main():
-    # 数据文件夹的根路径
-    dataset_dir = "/Users/duling/Desktop/code/Geo_All2All/dataset/reallset/"
+# --------------------------------------------------------------------------------------------------------------
 
-    # 定义各参数文件夹的路径
-    latency_file = os.path.join(dataset_dir, "latency/1", "matrix_0.json")  # 时延 NxN 矩阵
-    bandwidth_file = os.path.join(dataset_dir, "bandwidth", "bandwidth_0.json")  # 带宽 N 数组
-    conflict_file = os.path.join(dataset_dir, "conflict_rate", "conflict_0.json")  # 冲突率 NxN 矩阵
-    num_messages_file = os.path.join(dataset_dir, "num_message", "num_message_0.json")  # 每个节点的消息个数 N 数组
-
-    # 加载数据
-    latency_matrix = load_data(latency_file)
-    bandwidth_array = load_data(bandwidth_file)
-    conflict_matrix = load_data(conflict_file)
-    num_messages_array = load_data(num_messages_file)
-
-    # 检查是否所有数据都已加载
-    if latency_matrix is None or bandwidth_array is None or conflict_matrix is None or num_messages_array is None:
-        print("加载数据失败，退出程序。")
-        return
-
-    # 调用 get_group.py 获取分组情况
-    group_result = call_get_group(latency_file)
-    if group_result is None:
-        print("获取分组结果失败，退出程序。")
-        return
-
-    # 打印所有加载的输入数据和分组情况
-    print_loaded_data(latency_matrix, bandwidth_array, conflict_matrix, num_messages_array, group_result)
-
-# 计算 makespan
 def calculate_makespan(latency_matrix, bandwidth_array, conflict_matrix, message_size, num_messages_array, group_result):
     """
     计算 makespan 的逻辑。
@@ -155,7 +155,7 @@ def calculate_makespan(latency_matrix, bandwidth_array, conflict_matrix, message
     """
     N = len(latency_matrix)  # 节点数量
     makespan_matrix = np.zeros((N, N))  # 初始化完成时间矩阵
-    
+
     # 计算 单条路径 makespan
     def calculate_single_path_time(src, dst, group_result):
         """
@@ -222,23 +222,37 @@ def calculate_makespan(latency_matrix, bandwidth_array, conflict_matrix, message
     final_makespan = np.max(makespan_matrix)
     return final_makespan
 
-    # # 计算 makespan
-    # 用于调试，仅导入数据，不计算
-    # makespan = calculate_makespan(latency_matrix, bandwidth_array, conflict_matrix, MESSAGE_SIZE_MB, num_messages_array, group_result)
+# -------------------------------------------------------------------------------------------
 
-    # 输出结果
-    print(f"Makespan 结果: {makespan}")
+def create_log_file(log_dir, algorithm, latency_file):
+    """
+    动态生成日志文件名，并返回日志文件的完整路径
+    :param log_dir: 日志目录
+    :param algorithm: 分组算法名称
+    :param latency_file: 时延矩阵文件路径，用于提取文件名称
+    :return: 日志文件路径
+    """
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)  # 如果日志目录不存在则创建
 
-def main():
+    # 提取时延矩阵文件名（例如 matrix_100）
+    matrix_name = os.path.splitext(os.path.basename(latency_file))[0]
+
+    # 生成文件名，例如：random_group_matrix_100_result.log
+    log_filename = f"{algorithm}_{matrix_name}_result.log"
+
+    # 返回完整的日志文件路径
+    return os.path.join(log_dir, log_filename)
+
+# -------------------------------------------------------------------------------------------
+
+def main(latency_file, bandwidth_file, conflict_file, num_messages_file, algorithm, log_dir, output_dir):
     try:
-        # 数据文件夹的根路径
-        dataset_dir = "/Users/duling/Desktop/code/Geo_All2All/dataset/reallset/"
+        # 创建日志文件
+        log_file_path = create_log_file(log_dir, algorithm, latency_file)
 
-        # 定义各参数文件夹的路径
-        latency_file = os.path.join(dataset_dir, "latency/1", "matrix_0.json")
-        bandwidth_file = os.path.join(dataset_dir, "bandwidth", "bandwidth_0.json")
-        conflict_file = os.path.join(dataset_dir, "conflict_rate", "conflict_0.json")
-        num_messages_file = os.path.join(dataset_dir, "num_message", "num_message_0.json")
+        # 设置日志系统
+        setup_logger(log_file_path)
 
         # 加载数据
         latency_matrix = load_data(latency_file)
@@ -252,7 +266,7 @@ def main():
             return
 
         # 调用 get_group.py 获取分组情况
-        group_result = call_get_group(latency_file)
+        group_result = call_get_group(latency_file=latency_file, algorithm=algorithm, output_dir=output_dir)
         if group_result is None:
             print("获取分组结果失败，退出程序。")
             return
@@ -262,13 +276,31 @@ def main():
 
         # 计算 makespan
         makespan = calculate_makespan(latency_matrix, bandwidth_array, conflict_matrix, MESSAGE_SIZE_MB, num_messages_array, group_result)
-
-        # 输出结果
         print(f"Makespan 结果: {makespan}")
 
     except Exception as e:
         print(f"程序执行过程中出错: {e}")
         return
-
+            
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="计算 makespan 并生成日志")
+    parser.add_argument("--algorithm", required=True, help="分组算法名称")
+    parser.add_argument("--latency_file", required=True, help="时延矩阵文件路径")
+    parser.add_argument("--bandwidth_file", required=True, help="带宽文件路径")
+    parser.add_argument("--conflict_file", required=True, help="冲突率矩阵文件路径")
+    parser.add_argument("--num_messages_file", required=True, help="每个节点的消息个数文件路径")
+    parser.add_argument("--log_dir", required=True, help="日志文件保存目录")
+    parser.add_argument("--output_dir", required=True, help="分组结果保存目录")
+
+    args = parser.parse_args()
+
+    # 调用 main 函数
+    main(
+        args.latency_file,
+        args.bandwidth_file,
+        args.conflict_file,
+        args.num_messages_file,
+        args.algorithm,
+        args.log_dir,
+        args.output_dir
+    )
