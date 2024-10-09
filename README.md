@@ -47,20 +47,72 @@ $exec <num_node> <matrix_path> <group_path>
 
 // 修改节点分组逻辑 显示表示
 
-// 增加时延文件 写一个多伦的时延计算 并且输出简单图像
+// 增加时延文件 写一个多轮的时延计算
 
 
 ```shell
-project/
-├── include/       # 头文件目录，存放项目的头文件 (.hpp, .h)
-│   ├── type.hpp
-│   ├── io.hpp
-├── src/           # 源代码目录，存放项目的源代码文件 (.cpp, .c)
-│   └── single_all_to_all.cpp
-├── dataset/       # 数据集目录，存放输入数据文件
+├── README.md
+├── dataset
 │   ├── delay_matrix.txt
 │   ├── group_id.txt
-├── build/         # 编译输出目录，存放编译生成的文件（可选）
-├── run.sh         # 执行脚本文件
-└── Makefile       # 构建脚本或项目配置文件
+│   ├── new_delay_matrix.txt
+│   ├── operator_set.txt
+│   └── reallset
+├── draw
+│   ├── 1.py
+│   └── box.py
+├── include
+│   ├── io.hpp
+│   ├── json
+│   ├── nlohmann
+│   └── type.hpp
+├── makefile
+├── other
+│   ├── analyze.py
+│   ├── analyze2.py
+│   ├── count.py
+│   ├── generate.py
+│   └── test.py
+├── output
+│   ├── get_best_group_logs
+│   ├── get_best_makespan_logs
+│   ├── group_result
+│   ├── key_result
+│   ├── logs
+│   ├── makespan_result
+│   ├── new_delay_matrix
+│   ├── shortest_path
+│   ├── tmp
+│   ├── total_result
+│   └── us
+├── requirements.txt
+├── single_all_to_all.dSYM
+│   └── Contents
+├── src
+│   ├── __pycache__
+│   ├── best_group_detecttion.py
+│   ├── dp_group.py
+│   ├── get_group.py
+│   ├── get_makespan.py
+│   ├── get_makespan_best_group.py
+│   ├── kmeans_2_group.py
+│   ├── kmeans_4_group.py
+│   ├── kmeans_group.py
+│   ├── our_group.py
+│   ├── our_group_2.py
+│   ├── random_group.py
+│   ├── run.sh
+│   ├── run_best.sh
+│   ├── run_get_makespan_#.sh
+│   ├── shortest_group.py
+│   ├── shortest_group_1.py
+│   ├── single
+│   └── test.py
+├── tests
+├── zmq
+│   └── pyzmq-26.2.0
+└── zmq_use
+    ├── __init__.py
+    ├── agrregation_node.py
+    └── normal_node.py
 ```
