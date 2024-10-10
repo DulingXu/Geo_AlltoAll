@@ -83,6 +83,8 @@ if __name__ == "__main__":
         "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_analyze.log",   
        #  "/Users/duling/Desktop/code/Geo_All2All/output/key_result/best_group_detection_analyze.log", 
        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_analyze.log",
+       "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_analyze.log",
+    
     
     ]
 

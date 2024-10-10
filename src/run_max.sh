@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# 设置起始值、最大值和步长
+start=11100
+end=82400
+step=100
+
+# 循环调用 get_makespan_no_group_just_max.py
+for ((i=$start; i<=$end; i+=$step)); do
+  echo "运行 get_makespan_no_group_just_max.py 参数: $i"
+
+  python3 get_makespan_no_group_just_max.py \
+    --latency_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/latency/1/matrix_${i}.json \
+    --bandwidth_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/bandwidth/bandwidth_${i}.json \
+    --conflict_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/conflict_rate/conflict_${i}.json \
+    --num_messages_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/num_message/num_message_${i}.json \
+    --group_dir /Users/duling/Desktop/code/Geo_All2All/output/group_result/no_group_source \
+    --log_dir /Users/duling/Desktop/code/Geo_All2All/output/total_result/no_group_just_max
+done
