@@ -24,6 +24,7 @@ __pycache__/
 # ---- 日志文件 ----
 # 忽略日志文件
 *.log
+*.json
 logs/
 
 # ---- IDE/编辑器文件 ----
@@ -50,5 +51,5 @@ build/
 .env.local
 
 # ---- 忽略图片 ----
-.pdf
-.png
+*.pdf
+*.png
