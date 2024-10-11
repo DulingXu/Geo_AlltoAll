@@ -1,17 +1,33 @@
 import os
 import matplotlib.pyplot as plt
 
-# 定义文件路径列表和方案名称
+# use to draw the makespan of different algorithms with different grouping schemes
+
+# 定义文件路径列表和方案名称    
 file_paths = [
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_analyze.log",
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_analyze.log",
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_analyze.log",
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_analyze.log",
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_analyze.log",
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_analyze.log",   
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_analyze.log",   
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_analyze.log",
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_analyze.log"
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_analyze.log",
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_analyze.log",
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_analyze.log",
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_analyze.log",
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_analyze.log",
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_analyze.log",   
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_analyze.log",   
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_analyze.log",
+    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_analyze.log"
+    
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_1_latency_analyze.log",
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_1_latency_analyze.log",
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_1_latency_analyze.log",
+    
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_1_latency_analyze.log",
+    
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_1_latency_analyze.log",
+    #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_1_1_latency_analyze.log",
+    #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_1_latency_analyze.log",   
+    #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_1_latency_analyze.log",   
+    #  "/Users/duling/Desktop/code/Geo_All2All/output/key_result/best_group_detection_analyze.log", 
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_1_latency_analyze.log",
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_1_latency_analyze.log",
 ]
 
 labels = [
@@ -21,7 +37,7 @@ labels = [
     "Random Grouping",
     "Shortest Grouping",
     "Our Group",
-    "Our Group 2",
+    #"Our Group 2",
     "DP Group",
     "No Group Just Max"
 ]

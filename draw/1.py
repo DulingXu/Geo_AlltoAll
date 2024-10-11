@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import re
 
+# use to draw the execution time and makespan of different algorithms
+
 def read_data_from_log(file_path):
     """
     从给定的日志文件路径读取执行时间和 Makespan 结果
@@ -73,20 +75,32 @@ if __name__ == "__main__":
     # 随机分组
     # 最短路径，不考虑所有实现的问题，直接走最短路径的值，也是最低bound
     # 
-    file_paths = [
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_analyze.log",
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_analyze.log",
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_analyze.log",
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_analyze.log",
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_analyze.log",
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_analyze.log",   
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_analyze.log",   
-       #  "/Users/duling/Desktop/code/Geo_All2All/output/key_result/best_group_detection_analyze.log", 
-       "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_analyze.log",
-       "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_analyze.log",
+    # file_paths = [
+    #     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_analyze.log",
+    #     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_analyze.log",
+    #     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_analyze.log",
+    #     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_analyze.log",
+    #     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_analyze.log",
+    #     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_analyze.log",   
+    #     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_analyze.log",   
+    #    #  "/Users/duling/Desktop/code/Geo_All2All/output/key_result/best_group_detection_analyze.log", 
+    #    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_analyze.log",
+    #    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_analyze.log",
     
+    # ]
+    file_paths = [
+        #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_1_latency_analyze.log",
+        #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_1_latency_analyze.log",
+        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_1_latency_analyze.log",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_1_latency_analyze.log",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_1_latency_analyze.log",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_1_1_latency_analyze.log",
+        #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_1_latency_analyze.log",   
+        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_1_latency_analyze.log",   
+       #  "/Users/duling/Desktop/code/Geo_All2All/output/key_result/best_group_detection_analyze.log", 
+       #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_1_latency_analyze.log",
+       # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_1_latency_analyze.log",
     
     ]
-
     # 生成图表
     plot_results(file_paths)

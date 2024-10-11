@@ -80,7 +80,7 @@ def save_results(results, output_file):
 if __name__ == "__main__":
     # 指定日志文件路径和输出文件路径
     log_directory = "/Users/duling/Desktop/code/Geo_All2All/output/us"  # 日志文件的路径
-    output_file = "/Users/duling/Desktop/code/Geo_All2All/output/shortest_path/us_analyze2.log"  # 输出的结果路径
+    output_file = "/Users/duling/Desktop/code/Geo_All2All/output/shortest_path/_analyze2.log"  # 输出的结果路径
 
     # 分析日志文件
     results = analyze_logs(log_directory)

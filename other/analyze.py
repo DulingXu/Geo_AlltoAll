@@ -2,6 +2,7 @@ import os
 import re
 from datetime import datetime
 
+# use to  
 def parse_log_file(log_file):
     """
     解析单个日志文件，提取执行时间和 Makespan 结果
@@ -64,5 +65,5 @@ def process_log_files(input_directory):
 if __name__ == "__main__":
     # 直接指定输入目录路径
     # 需要分析的日志路径
-    input_directory = "/Users/duling/Desktop/code/Geo_All2All/output/total_result/dp_group"  
+    input_directory = "/Users/duling/Desktop/code/Geo_All2All/output/total_result/shortest_group_1_1_latency"  
     process_log_files(input_directory)
