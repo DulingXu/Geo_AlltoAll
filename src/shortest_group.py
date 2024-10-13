@@ -12,7 +12,6 @@ def floyd_warshall(matrix):
         for j in range(N):
             if i != j and matrix[i][j] != np.inf:
                 next_node[i][j] = j
-
     # 执行 Floyd-Warshall 算法
     for k in range(N):
         for i in range(N):

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 设置起始值、最大值和步长
-start=70100
-end=82400
+start=100
+end=33300
 step=100
 
 # 循环调用 get_makespan_best_group.py

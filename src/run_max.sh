@@ -13,8 +13,8 @@ for ((i=$start; i<=$end; i+=$step)); do
   python3 get_makespan_no_group_just_max.py \
     --latency_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/1_latency/matrix_${i}.json \
     --bandwidth_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/bandwidth/bandwidth_${i}.json \
-    --conflict_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/conflict_rate/conflict_${i}.json \
+    --conflict_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/conflict_rate_0.3/conflict_${i}.json \
     --num_messages_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/num_message_200/num_message_${i}.json \
     --group_dir /Users/duling/Desktop/code/Geo_All2All/output/group_result/no_group_source \
-    --log_dir /Users/duling/Desktop/code/Geo_All2All/output/total_result/no_group_just_max_200_1_latency
+    --log_dir /Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.3/no_group_conflict_200
 done

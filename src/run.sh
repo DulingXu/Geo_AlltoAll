@@ -7,14 +7,14 @@ end=33300
 step=100
 
 # 定义分组算法变量
-algorithm="dp_group"
+algorithm="rule_group"
 
 # 循环调用 get_makespan.py
 for ((i=$start; i<=$end; i+=$step)); do
   echo "运行 get_makespan.py 参数: $i"
   
   # 动态创建 log_dir 子目录，基于分组算法名称 用于存放输出
-  log_dir="/Users/duling/Desktop/code/Geo_All2All/output/total_result/${algorithm}_12_latency"
+  log_dir="/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.1/${algorithm}_conflict_0.1"
 
   # 确保目录存在
   mkdir -p $log_dir
@@ -25,8 +25,8 @@ for ((i=$start; i<=$end; i+=$step)); do
     --algorithm $algorithm \
     --latency_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/1_latency/matrix_${i}.json \
     --bandwidth_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/bandwidth/bandwidth_${i}.json \
-    --conflict_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/conflict_rate/conflict_${i}.json \
+    --conflict_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/conflict_rate_0.1/conflict_${i}.json \
     --num_messages_file /Users/duling/Desktop/code/Geo_All2All/dataset/reallset/num_message/num_message_${i}.json \
     --log_dir $log_dir \
-    --output_dir /Users/duling/Desktop/code/Geo_All2All/output/group_result/${algorithm}_12_latency
+    --output_dir /Users/duling/Desktop/code/Geo_All2All/output/group_result/conflict/0.1/${algorithm}_conflict_0.1
 done
