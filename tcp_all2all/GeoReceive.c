@@ -7,7 +7,8 @@
 #include <sys/socket.h>
 #include <ifaddrs.h>
 
-#define PORT 2022
+//#define PORT 2022
+#define PORT 3030
 #define BUFFER_SIZE 1024
 
 // 获取本地IP地址
