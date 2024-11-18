@@ -3,115 +3,93 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <sys/select.h>
 #include <pthread.h>
 
-#define PORT 5555
-#define BACKLOG 10
+#define PORT 8080
 #define MAX_SUBSCRIBERS 10
+#define BUFFER_SIZE 256
 
 typedef struct {
-    int fd; 
-    struct sockaddr_in address; 
+    int socket;
 } Subscriber;
 
-Subscriber subscribers[MAX_SUBSCRIBERS] = {0}; 
-int num_subscribers = 0; 
-int server_fd; 
+Subscriber *subscribers[MAX_SUBSCRIBERS];
+int subscriber_count = 0;
+pthread_mutex_t lock;
 
-void* create_publisher(void* arg) {
-    struct sockaddr_in address;
+void create_publisher() {
+    int server_socket;
+    struct sockaddr_in server_address;
 
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("Socket creation error");
-        return NULL;
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket < 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
     }
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = INADDR_ANY;
+    server_address.sin_port = htons(PORT);
 
-    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+    if (bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
         perror("Bind failed");
-        close(server_fd);
-        return NULL;
+        close(server_socket);
+        exit(EXIT_FAILURE);
     }
 
-    if (listen(server_fd, BACKLOG) < 0) {
+    if (listen(server_socket, MAX_SUBSCRIBERS) < 0) {
         perror("Listen failed");
-        close(server_fd);
-        return NULL;
+        close(server_socket);
+        exit(EXIT_FAILURE);
     }
 
-    printf("Publisher started. Listening on port %d.\n", PORT);
+    printf("Publisher created, waiting for subscribers...\n");
 
     while (1) {
-        int client_fd;
-        socklen_t addr_len = sizeof(subscribers[num_subscribers].address);
-        if ((client_fd = accept(server_fd, (struct sockaddr*)&subscribers[num_subscribers].address, &addr_len)) < 0) {
+        Subscriber *sub = malloc(sizeof(Subscriber));
+        socklen_t addr_len = sizeof(sub->socket);
+        sub->socket = accept(server_socket, NULL, &addr_len);
+        if (sub->socket < 0) {
             perror("Accept failed");
+            free(sub);
             continue;
         }
 
-        if (num_subscribers < MAX_SUBSCRIBERS) {
-            subscribers[num_subscribers].fd = client_fd;
-            num_subscribers++;
-            printf("Subscriber %d connected.\n", client_fd);
+        pthread_mutex_lock(&lock);
+        if (subscriber_count < MAX_SUBSCRIBERS) {
+            subscribers[subscriber_count++] = sub;
+            printf("New subscriber connected.\n");
         } else {
-            printf("Max subscribers reached. Closing connection.\n");
-            close(client_fd); 
+            printf("Max subscribers reached. Rejecting new connection.\n");
+            close(sub->socket);
+            free(sub);
         }
+        pthread_mutex_unlock(&lock);
     }
 
-    return NULL; 
+    close(server_socket);
 }
 
-int get_info(char* addresses[], int* ports[]) {
-    int count = 0;
-
-    for (int i = 0; i < num_subscribers; i++) {
-        if (subscribers[i].fd != -1) {
-            addresses[count] = inet_ntoa(subscribers[i].address.sin_addr);
-            ports[count] = ntohs(subscribers[i].address.sin_port);
-            count++;
-        }
+void publish(const char *message) {
+    pthread_mutex_lock(&lock);
+    for (int i = 0; i < subscriber_count; ++i) {
+        send(subscribers[i]->socket, message, strlen(message), 0);
     }
-
-    return count;
-}
-
-void publish_message(const char* message) {
-    for (int i = 0; i < num_subscribers; i++) {
-        if (subscribers[i].fd != -1) {
-            send(subscribers[i].fd, message, strlen(message), 0);
-        }
-    }
+    pthread_mutex_unlock(&lock);
 }
 
 int main() {
-    pthread_t publisher_thread;
+    pthread_mutex_init(&lock, NULL);
 
+    pthread_t publisher_thread;
     if (pthread_create(&publisher_thread, NULL, create_publisher, NULL) != 0) {
         perror("Failed to create publisher thread");
         return -1;
     }
-
-    const char* message = "Hello, Subscribers!\n";
-    while (1) {
-        sleep(5); 
-        publish_message(message);
-
-        char* addresses[MAX_SUBSCRIBERS];
-        int ports[MAX_SUBSCRIBERS];
-        int count = get_info(addresses, ports);
-
-        printf("Currently connected subscribers (%d):\n", count);
-        for (int i = 0; i < count; i++) {
-            printf("Subscriber %d: %s:%d\n", i + 1, addresses[i], ports[i]);
-        }
-    }
-
-    close(server_fd);
+    const char* message = "Hello, Subscribers!\n"; 
+    publish(message);
     pthread_join(publisher_thread, NULL);
+
+    pthread_mutex_destroy(&lock);
     return 0;
 }
