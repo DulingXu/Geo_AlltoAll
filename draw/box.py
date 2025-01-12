@@ -5,36 +5,22 @@ import numpy as np
 
 # 定义文件路径列表和方案名称
 file_paths = [
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_analyze.log",
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_analyze.log",
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_analyze.log",
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_analyze.log",
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_analyze.log",
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_analyze.log"
-    
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_1_latency_analyze.log",
     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_1_latency_analyze.log",
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_1_latency_analyze.log",
     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_1_latency_analyze.log",
     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_1_latency_analyze.log", 
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_1_latency_analyze.log",
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_1_1_latency_analyze.log",
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_1_latency_analyze.log",   
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_1_latency_analyze.log",   
-    # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/best_group_detection_analyze.log", 
-    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_1_latency_analyze.log",
     "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_200_1_latency_analyze.log",
+    "/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_1_latency_analyze.log",
 ]
 
 labels = [
-    "KMeans Grouping\n(K=3)",
-    "KMeans Grouping\n(K=2)",
-    "KMeans Grouping\n(K=4)",
-    "Random Grouping",
-    "Shortest Grouping\n (low bound) ",
-    # "Shortest Grouping_1",
-    # "our_group_2",
-    "Node Grouping\n (our's) ",
-    "No Grouping",
+    "Kmeans \n(K=2)",
+    "Kmeans \n(K=3)",
+    "Kmeans \n(K=4)",
+    "Random",
+    "GeoGauss",
+    "Geo-Alltoall ",
+
 ]
 
 # 从文件中提取最后的 Makespan 值
@@ -75,46 +61,57 @@ for path in file_paths:
 if len(labels) != len(all_makespans):
     raise ValueError("标签数量必须与 all_makespans 中的数据集数量一致。")
 
-# 定义颜色
-colors = ['lightblue', 'lightgreen', 'lightcoral', 'lightyellow', 'lightpink', 'lightgray']
+# 定义颜色，与 @box_conflict.py 保持一致
+colors = ['#FF9999', '#66B3FF', '#99FF99', '#FFCC99', '#FFD700', '#8A2BE2']  # 自定义颜色
 
-# 创建正方形比例的图
-plt.figure(figsize=(16, 8))  
+# 调整图幅大小，确保和 @box_conflict.py 保持一致
+plt.figure(figsize=(10, 6))
+
+# 绘制箱线图，确保箱子宽度一致
 box = plt.boxplot(
     all_makespans, 
     patch_artist=True, 
-    tick_labels=labels, 
-    widths=0.24,
-    flierprops=dict(marker='o', color='red', markersize=5)  # 设置异常值的样式
+    widths=0.34,  # 设置一致的箱子宽度
+    flierprops=dict(marker='o', color='black', markersize=5)  # 设置异常值样式
 )
 
 # 设定不同的颜色和加粗框线
 for patch, color in zip(box['boxes'], colors):
     patch.set_facecolor(color)
-    patch.set_linewidth(2)  # Set the linewidth to make the box edges thicker
+    patch.set_linewidth(2)  # 设置框线宽度
 
-# 计算每个方案的平均值并在箱线图上标注，向右偏移0.2个柱子的宽度，向上偏移1
+# 计算每个方案的平均值并在箱线图上标注
 for i, makespans in enumerate(all_makespans, start=1):
     mean_val = np.mean(makespans)  # 计算均值
-    plt.text(i+0.36, mean_val, f'{mean_val:.2f}', horizontalalignment='center', verticalalignment='center', fontsize=16, color='black')
+    plt.text(i+0.46, mean_val, f'{mean_val:.2f}', horizontalalignment='center', verticalalignment='center', fontsize=16, color='black')
 
 # 设置图标题和标签
-plt.ylabel('Makespan (ms)', fontsize=20)
+plt.ylabel('All-to-All Completion Time (ms)', fontsize=22)
+#plt.title('All-to-All Completion Time (Conflict-Free)', fontsize=28)
 
-# 设置刻度字体大小
-plt.xticks(rotation=16, fontsize=18)
+# 设置刻度字体大小，不倾斜
+plt.xticks(range(1, len(labels) + 1), labels, fontsize=19)
 plt.yticks(fontsize=18)
 
-# 去掉右边和上边的框线
-ax = plt.gca()  # 获取当前的Axes对象
-ax.spines['right'].set_visible(False)
-ax.spines['top'].set_visible(False)
+# 设置Y轴范围
+plt.ylim(260, 680)  # 设置Y轴的最大值为800
 
+# 去掉右边和上边的框线
+ax = plt.gca()
+ax.spines['right'].set_visible(True)
+ax.spines['top'].set_visible(True)
+
+# 增加网格线
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.grid(True, linestyle='--', alpha=0.6, which='major', axis='y')  # Move the grid line of the mean value up
+
+# 留出右边的空间
+plt.xlim(0.75, len(labels) + 0.78)  # x 轴增加额外空间，右侧多 --- 的空间
+plt.subplots_adjust(left=0.1,right=0.99,top=0.99)  # 调整左边距，减小值可以减少空白区域    
 # 调整布局
-plt.tight_layout()
 
 # 保存图表为PDF文件
-plt.savefig('box_result_square_with_means_shifted.pdf')
+plt.savefig('box_without_conflict.pdf')
 
 # 显示图表
 plt.show()

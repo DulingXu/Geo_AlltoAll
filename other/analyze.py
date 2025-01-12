@@ -49,6 +49,11 @@ def process_log_files(directories, output_directory):
         os.makedirs(output_directory)
 
     for input_directory in directories:
+        # Check if the input directory exists
+        if not os.path.exists(input_directory):
+            print(f"输入目录不存在: {input_directory}")
+            continue  # Skip to the next directory if it doesn't exist
+
         # 获取输入目录的最后一层名称
         dir_name = os.path.basename(os.path.normpath(input_directory))
         output_file = os.path.join(output_directory, f"{dir_name}_analyze.log")
@@ -72,15 +77,34 @@ def process_log_files(directories, output_directory):
 if __name__ == "__main__":
     # 指定多个输入目录路径
     input_directories = [
-        "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.1/rule_group_conflict_0.1",
-        "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.2/rule_group_conflict_0.2",
-        "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.3/rule_group_conflict_0.3",
-        "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.4/rule_group_conflict_0.4",
-        "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.5/rule_group_conflict_0.5",
+        
+        "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.5/band-50/7_group",
+        # "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.1/band-50/dp_group",
+        # "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.1/band-50/kmeans_3_group",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.1/7_group_conflict_0.1",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.2/7_group_conflict_0.2",
+        #"/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.5/7_group_conflict_0.5_60",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.4/7_group_conflict_0.4",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/0.5/7_group_conflict_0.5",
+        
+        # "/Users/duling/Desktop/code/Geo_All2All/output/test_dp_0.5/total_result_0.5_dp_1w",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/test1_dp_0.5_band/total_result_0.5_dp_1w_band",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/test_dp_0.5_10band_band/total_result_0.5_dp_1w_band_10",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/test_7_0.5_10band_band/total_result_0.5_7_1w_band_10",
+        
+        # "/Users/duling/Desktop/code/Geo_All2All/output/total_result/dp_group_1_latency_band",
+        # "/Users/duling/Desktop/code/Geo_All2All/output/total_result/no_group_just_max_1_latency_band",
+        # "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.5/band-50/7_group",
+        # "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.5/band-50/dp_group",
+        # "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.5/band-50/kmeans_2_group",
+        # "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.5/band-50/kmeans_3_group",
+        # "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.5/band-50/kmeans_4_group",
+        # "/Users/duling/Desktop/code/Geo_All2All/output-1/total_result/conflict-0.5/band-50/random_group",
+        
         # 添加更多目录路径
     ]
 
     # 指定输出目录路径
-    output_directory = "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/key_result"
+    output_directory = "/Users/duling/Desktop/code/Geo_All2All/output-1/key-analyze-result/0.1-50"
 
     process_log_files(input_directories, output_directory)

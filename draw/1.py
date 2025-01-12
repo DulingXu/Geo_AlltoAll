@@ -91,16 +91,22 @@ if __name__ == "__main__":
     file_paths = [
         #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_group_1_latency_analyze.log",
         #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_2_group_1_latency_analyze.log",
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_1_latency_analyze.log",
+       # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/kmeans_4_group_1_latency_analyze.log",
         # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/random_group_1_latency_analyze.log",
         # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_1_latency_analyze.log",
         # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/shortest_group_1_1_latency_analyze.log",
         #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_1_latency_analyze.log",   
-        "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_1_latency_analyze.log",   
+       # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/our_group_2_1_latency_analyze.log",   
        #  "/Users/duling/Desktop/code/Geo_All2All/output/key_result/best_group_detection_analyze.log", 
        #"/Users/duling/Desktop/code/Geo_All2All/output/key_result/dp_group_1_latency_analyze.log",
        # "/Users/duling/Desktop/code/Geo_All2All/output/key_result/no_group_just_max_1_latency_analyze.log",
-    
+    #    "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/total_result_0.5_dp_1w_band_analyze.log",
+    #    "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/total_result_0.5_dp_1w_analyze.log",
+       
+    #    "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/total_result_0.5_7_1w_band_10_analyze.log",
+    #    "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/total_result_0.5_dp_1w_band_10_analyze.log",
+    "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/no_group_just_max_1_latency_band_analyze.log",
+    "/Users/duling/Desktop/code/Geo_All2All/output/total_result/conflict/dp_group_1_latency_band_analyze.log",
     ]
     # 生成图表
     plot_results(file_paths)
